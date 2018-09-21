@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="msapplication-tap-highlight" content="no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>表白墙</title>
+    <link rel="stylesheet" href="static/materialize.min.css"/>
+    <link rel="icon" href="static/bupt_logo.png"/>
+</head>
+<body>
+<nav class="red lighten-2" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">{{.title}}</a></div>
+</nav>
+<div style="text-align:center;">
+    <a href="../not_checked?isToday=true">跳转至今日表白审核<br/></a>
+    <a href="../not_checked?isToday=false">跳转至所有表白审核<br/></a>
+    <a href="../checked?isToday=true">跳转至今日表白通过列表<br/></a>
+    <a href="../checked?isToday=false">跳转至所有表白通过列表<br/></a>
+</div>
+<main>
+{{range $index,$msg := .msgs}}
+    <div class="container">
+        <div class="section">
+            <form action="/pass" method="post" name= {{$msg.Id}}>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea id="id" name='id' readonly='readonly'>{{$msg.Id}}</textarea>
+                        <textarea id="content" name='content' readonly='readonly'>{{$msg.Content}}</textarea>
+                        <label for="content">id&内容&时间</label>
+                        <textarea id="time" name='time' readonly='readonly'>{{$msg.Date | format}}</textarea>
+                    </div>
+                </div>
+                <button id="submit" class="btn waves-effect waves-light" type="submit" name="action">从通过列表中删除</button>
+            </form>
+        </div>
+    </div>
+
+{{end}}
+</main>
+<footer class="page-footer">
+    <div class="container">
+        <div class="section center-align white-text">
+            Copyright 2017 BUPT.
+        </div>
+    </div>
+</footer>
+<script src="static/jquery-2.1.4.min.js"></script>
+<script src="static/materialize.min.js"></script>
+</body>
+</html>

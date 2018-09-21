@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>登录页</title>
+<link rel="stylesheet" href="../static/materialize.min.css" />
+<link rel="icon" href="../static/bupt_logo.png" />
+</head>
+<body>
+  <main>
+    <div class="container">
+      <div class="section">
+      <form action="/login" method="post" >
+      <div class="row">
+      <label for='auth'>用户名</label>
+      <div class="input-field col s12">
+          <input name="auth" id="auth" class="materialize-input"></input>
+        </div>
+      </div>
+        <div class="row">
+        <label>密码</label>
+        <div class="input-field col s12">
+          <input name="password" id="password" class="materialize-input"></input>
+        </div>
+      </div>
+        <button id="submit" class="btn waves-effect waves-light" type="submit" name="action">登录</button>
+      </form>
+      </div>
+
+  </main>
+  <script src="../static/jquery-2.1.4.min.js"></script>
+  <script src="../static/materialize.min.js"></script>
+</body>
+</html>
