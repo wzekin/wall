@@ -8,9 +8,10 @@ import (
 )
 
 type Data struct {
-	Id      int       `orm:"auto"`
-	Content string    `orm:"type(text)"`
-	Date    time.Time `orm:"auto_now_add;type(date)"`
+	Id      int `orm:"auto"`
+	WxId    string
+	Date    string `orm:"size(10)"`
+	Content string `orm:"type(text)"`
 	Check   bool
 }
 
@@ -19,19 +20,22 @@ func init() {
 	orm.Debug = true
 }
 
-func GetData(checked bool, t time.Time) (datas []Data, err error) {
+func GetData(checked bool, time string) (datas []Data, err error) {
 	o := orm.NewOrm()
-	hasTime := FormatTime(t) != FormatTime(time.Time{})
+	hasTime := time != ""
 	if !hasTime {
 		_, err = o.QueryTable("data").Filter("check", checked).All(&datas)
 	} else {
-		_, err = o.QueryTable("data").Filter("check", checked).Filter("date", t).All(&datas)
+		_, err = o.QueryTable("data").Filter("check", checked).Filter("date", time).All(&datas)
 	}
 	return
 }
 
 func (d *Data) Insert() (err error) {
 	o := orm.NewOrm()
+	if d.Date == "" {
+		d.Date = FormatTime(time.Now())
+	}
 	_, err = o.Insert(d)
 	return
 }
@@ -54,4 +58,20 @@ func (d *Data) Update() (err error) {
 
 func FormatTime(t time.Time) string {
 	return t.Format("2006-01-02")
+}
+
+func (d Data) CheckExist() bool {
+	if d.Date == "" {
+		d.Date = FormatTime(time.Now())
+	}
+	o := orm.NewOrm()
+	err := o.Read(&d, "date", "wx_id")
+	if err != nil {
+		return true
+	}
+	if d.Id != 0 {
+		return true
+	} else {
+		return false
+	}
 }

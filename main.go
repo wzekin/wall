@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
 	"time"
-	"wall/models"
 	_ "wall/routers"
 )
 
@@ -16,12 +15,10 @@ func init() {
 	beego.BConfig.WebConfig.Session.SessionOn = true
 	beego.SetStaticPath("/fonts/roboto", "static")
 	beego.AddFuncMap("add", add)
-	beego.AddFuncMap("format", models.FormatTime)
 }
 
 func main() {
-	d := models.Data{Content: "1231", Date: time.Now().AddDate(0, 0, -1)}
-	d.Insert()
+	beego.Informational(time.Now())
 	beego.Run()
 }
 

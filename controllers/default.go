@@ -1,10 +1,17 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
+	"io/ioutil"
+	"net/http"
 	"time"
 	"wall/models"
 )
+
+const APPID string = "wx98695df4fa0decb7"
+const APPSECRET string = "610cdfd7e2f61641466e9e442708447a"
 
 type MainController struct {
 	beego.Controller
@@ -12,39 +19,44 @@ type MainController struct {
 
 //主页面
 func (c *MainController) Get() {
-	c.Data["msgs"], _ = models.GetData(true, time.Now().AddDate(0, 0, -1))
-	c.TplName = "wall.html"
+	c.Data["json"], _ = models.GetData(true, models.FormatTime(time.Now().AddDate(0, 0, -1)))
+	c.ServeJSON()
 }
 
 //提交表白信息
 func (c *MainController) Post() {
-	d := models.Data{Content: c.GetString("content")}
-	err := d.Insert()
+	code := c.GetString("code")
+	url := fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
+		APPID, APPSECRET, code)
+	res, err := http.Get(url)
 	if err != nil {
 		beego.Error(err)
+		c.Abort("500")
 	}
-	c.Ctx.WriteString("<script>alert('提交成功');window.location.href = '/';</script>")
-	return
-}
-
-//后台
-type UnderController struct {
-	beego.Controller
-}
-
-//查询表白审核
-//所有表白审核 所有通过表白 所有今天表白审核 所有今天通过表白
-func (c *UnderController) Post() {
-	checked, err := c.GetBool("checked")
+	defer res.Body.Close()
+	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		beego.Error(err)
+		c.Abort("500")
 	}
-	t, _ := time.Parse("2006-01-02", c.GetString("time"))
-	c.Data["json"], err = models.GetData(checked, t)
+	j := make(map[string]string)
+	beego.Informational(string(b))
+	err = json.Unmarshal(b, &j)
 	if err != nil {
-		return
+		beego.Error(err)
+		c.Abort("500")
 	}
-	c.ServeJSON()
+	d := models.Data{Content: c.GetString("content"), WxId: j["openid"]}
+	if d.CheckExist() {
+		c.Ctx.WriteString("今日已提交")
+	} else {
+		err = d.Insert()
+		if err != nil {
+			beego.Error(err)
+			c.Abort("500")
+		}
+		c.Ctx.WriteString("提交成功")
+	}
 }
 
 //登陆
@@ -85,14 +97,14 @@ func (c *CheckController) Checked() {
 	}
 	var datas []models.Data
 	if b {
-		datas, err = models.GetData(true, time.Now())
+		datas, err = models.GetData(true, models.FormatTime(time.Now()))
 		c.Data["title"] = "今日表白通过列表"
 		if err != nil {
 			beego.Error(err)
 			return
 		}
 	} else {
-		datas, err = models.GetData(true, time.Time{})
+		datas, err = models.GetData(true, "")
 		if err != nil {
 			beego.Error(err)
 			return
@@ -111,14 +123,14 @@ func (c *CheckController) NotChecked() {
 	}
 	var datas []models.Data
 	if b {
-		datas, err = models.GetData(false, time.Now())
+		datas, err = models.GetData(false, models.FormatTime(time.Now()))
 		if err != nil {
 			beego.Error(err)
 			return
 		}
 		c.Data["title"] = "今日表白审核"
 	} else {
-		datas, err = models.GetData(false, time.Time{})
+		datas, err = models.GetData(false, "")
 		if err != nil {
 			beego.Error(err)
 			return
