@@ -69,7 +69,7 @@ func (c *LoginController) Get() {
 	c.TplName = "login.html"
 }
 
-func (c *LoginController) PrePare() {
+func (c *LoginController) Prepare() {
 	s := c.GetSession("fail")
 	if s != nil {
 		if s.(int) > 2 {
@@ -86,12 +86,12 @@ func (c *LoginController) Post() {
 	} else {
 		n := c.GetSession("fail")
 		var num int
-		if n != nil {
+		if n == nil {
 			num = 1
 		} else {
 			num = n.(int) + 1
 		}
-		c.Ctx.WriteString(fmt.Sprintf("<script>alert('登陆失败'),你还有%d次登陆机会;window.location.href = '/login';</script>", 3-num))
+		c.Ctx.WriteString(fmt.Sprintf("<script>alert('登陆失败,你还有%d次登陆机会');window.location.href = '/login';</script>", 3-num))
 		c.SetSession("fail", num)
 	}
 }
