@@ -28,6 +28,12 @@ func GetData(checked bool, time string) (datas []Data, err error) {
 	} else {
 		_, err = o.QueryTable("data").Filter("check", checked).Filter("date", time).All(&datas)
 	}
+	if err != nil {
+		if err.Error() == "<QuerySeter> no row found" {
+			return nil, nil
+		}
+	}
+	beego.Informational(datas)
 	return
 }
 
@@ -50,8 +56,7 @@ func (d *Data) Update() (err error) {
 		return err
 	}
 	d.Check = !d.Check
-	beego.Informational(d.Id)
-	beego.Informational(d.Check)
+	beego.Informational(d)
 	_, err = o.Update(d)
 	return
 }

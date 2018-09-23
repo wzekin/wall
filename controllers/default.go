@@ -171,5 +171,5 @@ func (c *CheckController) Pass() {
 		beego.Error()
 		return
 	}
-	c.Ctx.WriteString("<script>alert('提交成功')</script>")
+	c.Ctx.WriteString("<script>alert('提交成功');window.location.href = document.referrer;</script>")
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	orm.RegisterDriver("mysql", orm.DRSqlite)
+	orm.RegisterDriver("sqlite3", orm.DRSqlite)
 	orm.RegisterDataBase("default", "sqlite3", "data.db")
 
 	beego.BConfig.WebConfig.Session.SessionOn = true
