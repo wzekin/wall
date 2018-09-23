@@ -69,13 +69,31 @@ func (c *LoginController) Get() {
 	c.TplName = "login.html"
 }
 
+func (c *LoginController) PrePare() {
+	s := c.GetSession("fail")
+	if s != nil {
+		if s.(int) > 2 {
+			c.Abort("403")
+		}
+	}
+}
+
 //登陆提交
 func (c *LoginController) Post() {
 	if c.GetString("auth") == "goland" && c.GetString("password") == "beego" {
 		c.SetSession("login", true)
 		c.Ctx.WriteString("<script>alert('登陆成功');window.location.href = '/checked?isToday=true';</script>")
+	} else {
+		n := c.GetSession("fail")
+		var num int
+		if n != nil {
+			num = 1
+		} else {
+			num = n.(int) + 1
+		}
+		c.Ctx.WriteString(fmt.Sprintf("<script>alert('登陆失败'),你还有%d次登陆机会;window.location.href = '/login';</script>", 3-num))
+		c.SetSession("fail", num)
 	}
-	c.Ctx.WriteString("<script>alert('登陆失败');window.location.href = '/login';</script>")
 }
 
 //后端渲染

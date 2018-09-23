@@ -4,7 +4,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
-	"time"
 	_ "wall/routers"
 )
 
@@ -18,7 +17,6 @@ func init() {
 }
 
 func main() {
-	beego.Informational(time.Now())
 	beego.Run()
 }
 
